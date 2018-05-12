@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+    <h1> Example Paylable dapp etheruem  </h1>
+    
+
+    <h2> collect money from the contract:</h2><br>
+    <input type="text" name="collectmoney" id="collectmoneycontract"><br>
+    <input type="submit" value="collect" id="collect"> <br>
+    <label id="collectlabelmoney"> Tx Collect Money </label>
+    <br>
+
+    <h2> verify money in the contract:</h2><br>
+    <input type="submit" value="verify" id="verify"> <br>
+    <label id="verifimoney"> Balance Contract in Wei </label>
+    <br>
+
+
+    <h3> transfer money to the contract </h3>
+    <input type="text" name="pagar contrato" id="transferiracontrato"><br>
+    <input type="submit" value="transferir" id="transfermony"> <br>
+    <label id="transferlabelmoney"> Tx transfer money </label>
+    <br>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    
+
+    <script>
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+          //  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:3000"));
+           web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        
+     var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"}]';
+     var    abiDefinition= JSON.parse(contract_abidefinition);
+    var contract = web3.eth.contract(abiDefinition);
+    var instance= contract.at("0x8d2d9fdad3774f96cda535c3be5f7fabff334e77");
+    console.log(instance);
+    console.log(web3.eth.defaultAccount);
+    $("#loader").hide();
+    $("#collect").click(function() {
+        console.log("ingreso una vez ");
+        $("#loader").show();
+        var value=$('#collectmoneycontract').val();
+        instance.Cobrar(value,(err,res)=>{ if (!err)
+            $("#loader").hide();});
+    
+      });
+
+      $("#verify").click(function() {
+        console.log("verificar");
+        $("#loader").show();
+        instance.AcumuladoContrato((err,res)=>{ 
+            if (err) {
+                alert("ocurrio un error!");
+            }
+            else {
+                alert(res);
+            }
+            $("#loader").hide();});
+    
+      });
+
+      $("#transfermony").click(function() {
+        console.log("verificar");
+        $("#loader").show();
+
+        instance.PagarMas({
+           // from: web3.eth.defaultAccount,
+            value: web3.toWei('1', 'ether'), 
+          },(err,res)=>{ if (!err)
+            $("#loader").hide();});
+    
+      });
+
+        /*instance.PagarMas(value=1000,(err,res)=>{ 
+            if (err) {
+                alert("ocurrio un error!");
+            }
+            else {
+                alert(res);
+            }
+            $("#loader").hide();});
+    
+      });*/
+
+
+
+
+
+
+
+
+    </script>
+
+
+</body>
+</html>
