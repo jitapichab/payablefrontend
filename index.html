@@ -8,8 +8,8 @@
     <h1> Example Paylable dapp etheruem  </h1>
     
 
-    <h2> collect money from the contract:</h2><br>
-    <input type="text" name="collectmoney" id="collectmoneycontract"><br>
+    <h2> harvest money from the contract:</h2><br>
+    <input type="text" name="harvest" id="collectmoneycontract"><br>
     <input type="submit" value="collect" id="collect"> <br>
     <label id="collectlabelmoney"> Tx Collect Money </label>
     <br>
@@ -27,31 +27,41 @@
     <br>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     
 
     <script>
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
         } else {
-            // set the provider you want from Web3.providers
-          //  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:3000"));
            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
         }
         web3.eth.defaultAccount = web3.eth.accounts[0];
         
-     var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"}]';
-     var    abiDefinition= JSON.parse(contract_abidefinition);
+    var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"fecha","type":"string"}],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"fecha","type":"string"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"pagador","type":"address"},{"indexed":false,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"cobrador","type":"address"},{"indexed":false,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
+    var    abiDefinition= JSON.parse(contract_abidefinition);
+    // crear objeto de tipo contrato con el json
     var contract = web3.eth.contract(abiDefinition);
-    var instance= contract.at("0x8d2d9fdad3774f96cda535c3be5f7fabff334e77");
+    var instance= contract.at("0xF55F507608F0f7e5baa158324Fb4AE46fEA40Ef8");
     console.log(instance);
-    console.log(web3.eth.defaultAccount);
     $("#loader").hide();
+    var fecha=new Date();
+    fecha= fecha.toString();
+    console.log(fecha);
+    
     $("#collect").click(function() {
         console.log("ingreso una vez ");
         $("#loader").show();
         var value=$('#collectmoneycontract').val();
-        instance.Cobrar(value,(err,res)=>{ if (!err)
-            $("#loader").hide();});
+        instance.Cobrar(value,fecha,(err,res)=>{ 
+            if (!err) {
+            $("#loader").hide();
+            }
+            else {
+                alert(err);
+                $("#loader").hide();
+            }
+        });
     
       });
 
@@ -72,12 +82,21 @@
       $("#transfermony").click(function() {
         console.log("verificar");
         $("#loader").show();
-
-        instance.PagarMas({
-           // from: web3.eth.defaultAccount,
-            value: web3.toWei('1', 'ether'), 
-          },(err,res)=>{ if (!err)
-            $("#loader").hide();});
+        var valor=$('#transferiracontrato').val();
+        console.log(valor);
+        instance.PagarMas(fecha,{
+            // from: web3.eth.defaultAccount,
+             value: web3.toWei(valor, 'ether'), 
+           },(err,res)=>{ 
+              if (!err) {
+                  alert("la transacción es:" +res);
+            $("#loader").hide();
+              }
+              else {
+                $("#loader").hide();
+                  alert(err);
+              }      
+        });
     
       });
 
