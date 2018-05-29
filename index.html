@@ -8,26 +8,42 @@
     <div class="jumbotron text-center">
         <h1>Example  etheruem blockchain </h1>
         <p>Transactions, calls, logs and events!</p> 
+        <img src="./images/etheruemicon.png" alt="Mountain View" height="147" width="91">
     </div>
     
+    <h2>harvest money from the contract: <span class="label label-default">Push the botton!</span></h2> <br>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="input-group">
+                <input type="text" class="form-control" id="collectmoneycontract" > 
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="collect"  >Collect!</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-4 -->
+    </div><!-- /.row -->
 
-    <h2> harvest money from the contract:</h2><br>
-    <input type="text" name="harvest" id="collectmoneycontract" class="form-control">
-    <input type="submit" value="collect" id="collect" class="btn btn-default"> <br>
-    <label id="collectlabelmoney"> Tx Collect Money </label>
-    <br>
 
-    <h2> verify money in the contract:</h2><br>
-    <input type="submit" value="verify" id="verify" class="btn btn-default"> <br>
-    <label id="verifimoney"> Balance Contract in Wei> </label>
-    <br>
+    <h2>Verify money in  the contract: <span class="label label-primary">Push the botton!</span></h2> <br>
+   
+    <div class="col-lg-4 col-lg-offset-4">
+        <button class="btn btn-default center-block col-lg-12" type="button" id="verify"  >Verify!</button> 
+    </div>         
+     <br>
 
-
-    <h3> transfer money to the contract </h3>
-    <input type="text" name="pagar contrato" id="transferiracontrato" class="form-control"><br>
-    <input type="submit" value="transferir" id="transfermony" class="btn btn-default"> <br>
-    <label id="transferlabelmoney"> Tx transfer money </label>
-    <br> <br>
+    <h2>Transfer money to the contract <span class="label label-success">Push the botton!</span></h2> <br>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="input-group">
+                <input type="text" class="form-control" id="transferiracontrato" > 
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="transfermony"  >Transfer!</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-4 -->
+    </div><!-- /.row -->
+   
+    <br> <br> <br>
      
     <div class="container"> 
         <input type="submit" class="btn btn btn-default col-md-3" value="Filtrar logs" id="filterlogs">
@@ -36,6 +52,37 @@
         <input type="submit" class="btn btn-success col-md-3" value="Filtrar logs" id="filterlogs">
     </div>
 
+    <div class="container">
+        <h2>Basic Table</h2>
+        <p>The .table class adds basic styling (light padding and only horizontal dividers) to a table:</p>            
+        <table class="table">
+          <thead>
+            <tr>
+              <th id="firstcolumn">Firstname</th>
+              <th>Lastname</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John</td>
+              <td>Doe</td>
+              <td>john@example.com</td>
+            </tr>
+            <tr>
+              <td>Mary</td>
+              <td>Moe</td>
+              <td>mary@example.com</td>
+            </tr>
+            <tr>
+              <td>July</td>
+              <td>Dooley</td>
+              <td>july@example.com</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
 
 
 
@@ -46,6 +93,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+            $("#firstcolumn").text("prueba");
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
         } else {
