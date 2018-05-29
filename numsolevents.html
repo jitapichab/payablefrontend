@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+    <h1> Example nums basics events  </h1>
+    
+
+    <h2> set num:</h2><br>
+    <input type="text" name="harvest" id="setnum" class="form-control">
+    <input type="submit" value="set" id="submitsetnum" class="btn btn-default"> <br>
+    <label id="setnumtx"> Tx set num </label>
+    <br>
+
+    <h2> ConsultNum:</h2><br>
+    <input type="submit" value="verify" id="verify" class="btn btn-default"> <br>
+    <label id="verifinum"> Num Consult </label>
+    <br>
+
+
+
+    <input type="submit" class="btn btn-info" value="Filtrar logs" id="filterlogs">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="./js/bignumber.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script>
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+           web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        
+    var    contract_abidefinition='[{"constant":false,"inputs":[],"name":"getNum","outputs":[{"name":"n","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"n","type":"uint256"}],"name":"setNum","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"x","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"caller","type":"address"},{"indexed":true,"name":"oldNum","type":"bytes32"},{"indexed":true,"name":"newNum","type":"bytes32"}],"name":"NumberSetEvent","type":"event"}]';
+    var    abiDefinition= JSON.parse(contract_abidefinition);
+    // crear objeto de tipo contrato con el json
+    var contract = web3.eth.contract(abiDefinition);
+    var instance= contract.at("0x5fAd5e614b7eaDC66C6A5C4f1Eb3775f612a6Be1");
+    console.log(instance);
+    $("#loader").hide();
+    var fecha=new Date();
+    fecha= fecha.toString();
+    console.log(fecha);
+    
+    $("#submitsetnum").click(function() {
+        console.log("ingreso una vez ");
+        $("#loader").show();
+        var value=$('#setnum').val();
+        instance.setNum(value,(err,res)=>{ 
+            if (!err) {
+            $("#loader").hide();
+            $("#setnumtx").text(res);
+            }
+            else {
+                $("#loader").hide();
+                alert(err);
+               
+            }
+        });
+    
+      });
+
+      $("#verify").click(function() {
+        console.log("verificar");
+        $("#loader").show();
+        instance.getNum.call((err,res)=>{ 
+            if (err) {
+                alert("ocurrio un error!");
+            }
+            else {
+                alert(res);
+            }
+            $("#loader").hide();});
+    
+      });
+
+      $("#filterlogs").click(function(){
+        console.log("se pulso boton filtrar logs!");
+
+        var events = instance.NumberSetEvent({},{ fromBlock:2000000, toBlock: "latest" });
+//        var event= instance.QuienCobro();
+       // var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
+        // watch for changes
+        /*events.watch(function(error, event){
+          if (!error)
+            console.log(event);
+        }); */
+      
+         events.get(function(error, logs){
+          if(error){
+              console.log('GET Error:',error);
+              
+          } else {
+              var inc=0;
+              console.log(logs);
+              for(i=0;i<logs.length;i++)
+             {
+                console.log(logs[i].transactionHash);
+                console.log(logs[i].blockNumber);
+                inc=logs[i].logIndex;
+                console.log(inc)
+                web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                       // for(i=0;i<res.length;i++)
+                       // {
+                        console.log(res);   
+                        console.log(new Date((res.timestamp)*1000));
+                        //console.log(Date((res.timestamp+inc)*1000));
+                       // }
+                    }    
+
+                });
+
+
+
+                  
+             }    
+
+          }
+      
+        });
+
+    });
+
+      // evento apenas se recarga la pagina
+      window.onload = function() {  
+        console.log("se cargo la pagina"); 
+        
+        
+      };
+
+
+
+
+
+
+
+    </script>
+
+
+</body>
+</html>

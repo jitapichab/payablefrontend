@@ -5,7 +5,10 @@
     <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
     <script src="./node_modules/web3/dist/web3.min.js"></script>
 
-    <h1> Example Paylable dapp etheruem  </h1>
+    <div class="jumbotron text-center">
+        <h1>Example  etheruem blockchain </h1>
+        <p>Transactions, calls, logs and events!</p> 
+    </div>
     
 
     <h2> harvest money from the contract:</h2><br>
@@ -25,10 +28,20 @@
     <input type="submit" value="transferir" id="transfermony" class="btn btn-default"> <br>
     <label id="transferlabelmoney"> Tx transfer money </label>
     <br> <br>
+     
+    <div class="container"> 
+        <input type="submit" class="btn btn btn-default col-md-3" value="Filtrar logs" id="filterlogs">
+        <input type="submit" class="btn btn-primary col-md-3" value="Filtrar logs" id="filterlogs">
+        <input type="submit" class="btn btn-info col-md-3" value="Filtrar logs" id="filterlogs">
+        <input type="submit" class="btn btn-success col-md-3" value="Filtrar logs" id="filterlogs">
+    </div>
 
-    <input type="submit" class="btn btn-info" value="Filtrar logs" id="filterlogs">
+
+
+
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="./js/bignumber.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
@@ -40,11 +53,11 @@
         }
         web3.eth.defaultAccount = web3.eth.accounts[0];
         
-    var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"fecha","type":"string"}],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"fecha","type":"string"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"pagador","type":"address"},{"indexed":true,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"cobrador","type":"address"},{"indexed":true,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
+    var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"fecha","type":"string"}],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"fecha","type":"string"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"pagador","type":"address"},{"indexed":false,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"cobrador","type":"address"},{"indexed":false,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
     var    abiDefinition= JSON.parse(contract_abidefinition);
     // crear objeto de tipo contrato con el json
     var contract = web3.eth.contract(abiDefinition);
-    var instance= contract.at("0xf64931a03D7ce81c250c3572AbB62b247B963b71");
+    var instance= contract.at("0x654d9E07C49a4ab6E14681F02f26F24305FC50A7");
     console.log(instance);
     $("#loader").hide();
     var fecha=new Date();
@@ -58,6 +71,7 @@
         instance.Cobrar(value,fecha,(err,res)=>{ 
             if (!err) {
             $("#loader").hide();
+            $("#collectlabelmoney").text(res);
             }
             else {
                 $("#loader").hide();
@@ -106,18 +120,26 @@
       $("#filterlogs").click(function(){
         console.log("se pulso boton filtrar logs!");
 
-        var events = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
-        events.watch(function(err, res){
-        if (!error){
-            console.log(result);
-        }
-        else {
-            console.log(err);
-        }
-    
-});
+        var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
+      
+         events.get(function(error, logs){
+          if(error){
+              console.log('GET Error:',error);
+              
+          } else {
+              console.log(logs);
+              for(i=0;i<logs.length;i++)
+             {
+                console.log(logs[i].blockNumber);
+                console.log(logs[i].args.cantidad.c[0]);
+                  
+             }    
 
-      });
+          }
+      
+        });
+
+    });
 
       // evento apenas se recarga la pagina
       window.onload = function() {  
