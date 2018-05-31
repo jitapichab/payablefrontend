@@ -47,7 +47,7 @@
      
     <div class="container"> 
         <input type="submit" class="btn btn btn-default col-md-3" value="Filter logs" id="filterlogs">
-        <input type="submit" class="btn btn-primary col-md-3" value="Event who harvest" id="filterlogs">
+        <input type="submit" class="btn btn-primary col-md-3" value="Event who harvest" id="filterevents">
         <input type="submit" class="btn btn-info col-md-3" value="Event who transfer" id="filterlogs">
         <input type="submit" class="btn btn-success col-md-3" value="All events " id="filterlogs">
     </div>
@@ -133,6 +133,7 @@
       $("#verify").click(function() {
         console.log("verificar");
         $("#loader").show();
+        console.log(web3.eth.defaultAccount)
         instance.AcumuladoContrato((err,res)=>{ 
             if (err) {
                 alert("ocurrio un error!");
@@ -166,24 +167,52 @@
       });
 
       $("#filterlogs").click(function(){
+        console.log("se pulso boton filtrar logs 2!");
+
+        var options= {
+            "fromBlock":"1",
+            "toBlock": "latest",
+            "address":[
+                "0x654d9E07C49a4ab6E14681F02f26F24305FC50A7"
+            ]
+        };
+        var filter = web3.eth.filter(options);
+        filter.get(function(error,logs){
+            if(error){
+                console.log('GET Error:',error);
+                
+            } else {
+                console.log(logs);
+                for(i=0;i<logs.length;i++)
+               {
+                  console.log(logs[i]);
+                    
+               }    
+            }    
+
+        });
+
+    });
+
+    $("#filterevents").click(function(){
         console.log("se pulso boton filtrar logs!");
 
         var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
       
          events.get(function(error, logs){
-          if(error){
-              console.log('GET Error:',error);
-              
-          } else {
-              console.log(logs);
-              for(i=0;i<logs.length;i++)
-             {
-                console.log(logs[i].blockNumber);
-                console.log(logs[i].args.cantidad.c[0]);
-                  
-             }    
+            if(error){
+                console.log('GET Error:',error);
+                
+            } else {
+                console.log(logs);
+                for(i=0;i<logs.length;i++)
+                {
+                    console.log(logs[i].blockNumber);
+                    console.log(logs[i].args.cantidad.c[0]);
+                    
+                }    
 
-          }
+            }
       
         });
 

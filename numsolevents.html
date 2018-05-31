@@ -23,6 +23,8 @@
 
     <input type="submit" class="btn btn-info" value="Filtrar logs" id="filterlogs">
 
+    <input type="submit" class="btn btn-info" value="Filtrar logs2" id="filterlogs2">
+
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="./js/bignumber.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
@@ -118,15 +120,47 @@
                     }    
 
                 });
-
-
-
                   
              }    
 
           }
       
         });
+
+    });
+
+    $("#filterlogs2").click(function(){
+        console.log("se pulso boton filtrar logs2!");
+
+        var options= {
+            "fromBlock":2381500,
+            "toBlock": "latest",
+            "address":[
+                "0x5fAd5e614b7eaDC66C6A5C4f1Eb3775f612a6Be1"
+            ],
+            "topics":[]
+        };
+        var options={fromBlock: 390000, toBlock: 'latest', address: '0x5fAd5e614b7eaDC66C6A5C4f1Eb3775f612a6Be1', topics: ['0x108fd0bf2253f6baf35f111ba80fb5369c2e004b88e36ac8486fcee0c87e61ce',null,null,'0x00000000000000000000000000000000000000000000000000000000000030a8']};
+      //  var filter = web3.eth.filter(options);
+       // var filter = web3.eth.filter({fromBlock: 350000, toBlock: 'latest'});
+        var filter=  web3.eth.filter(options);
+        console.log(filter);
+        filter.get(function(error,logs){
+            if(error){
+                console.log('GET Error:',error);
+                
+            } else {
+                console.log("ingreso a los logs!")
+                console.log(logs);
+                for(i=0;i<logs.length;i++)
+               {
+                  console.log(logs[i]);
+                    
+               }    
+            }    
+
+        });
+          
 
     });
 
