@@ -5,16 +5,16 @@ contract PagarContrato {
  
     constructor()  public payable { }
     
-    event QuienPago(address indexed  pagador, string  fecha, uint cantidad);
-    event QuienCobro( address indexed cobrador, string  fecha, uint  cantidad);
-    function PagarMas(string fecha) public payable  {
-        emit QuienPago(msg.sender,fecha, msg.value);
+    event QuienPago(address indexed  pagador, uint cantidad);
+    event QuienCobro( address indexed cobrador,  uint  cantidad);
+    function PagarMas() public payable  {
+        emit QuienPago(msg.sender, msg.value);
     }
   
     
-    function Cobrar(uint amount, string fecha) public  {
+    function Cobrar(uint amount) public  {
             msg.sender.transfer(amount);
-            emit QuienCobro(msg.sender, fecha, amount);
+            emit QuienCobro(msg.sender, amount);
        }
     
     function AcumuladoContrato() view public returns (uint) {
