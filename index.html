@@ -58,12 +58,12 @@
 
       <div class="container"> 
             <div class="btn-group-vertical col-md-6">
-                <input type="submit" class="btn btn btn-default" value="Filter logs" id="filterlogs">
+                <input type="submit" class="btn btn btn-default" value="Filter logs" id="filterlogsreal">
                 <input type="submit" class="btn btn btn-danger" value="stop logs" id="stoplogs">
             </div>
             <div class="btn-group-vertical col-md-6">
-                <input type="submit" class="btn btn-success col-md-3" value="All events " id="filterallevents">
-                <input type="submit" class="btn btn-success col-md-3" value="All events " id="filterallevents">
+                <input type="submit" class="btn btn-success col-md-3" value="All events " id="filtereventsreal">
+                <input type="submit" class="btn btn-success col-md-3" value="All events " id="stopevents">
             </div>
         </div>
         <br>
@@ -91,8 +91,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
-        var logs=null;
-            $("#firstcolumn").text("prueba");
+        var Blockslogs=[];
+        var Accountlogs=[];
+        var Ammount=[]; 
+        var Eventslogs=[];
+        var Incblocks=0;
+        
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
         } else {
@@ -257,6 +261,7 @@
                         else {
                            // for(i=0;i<res.length;i++)
                            // {
+                              
                             console.log(res);   
                             console.log(new Date((res.timestamp)*1000));
                             //console.log(Date((res.timestamp+inc)*1000));
@@ -275,6 +280,12 @@
 
 
     $("#filterallevents").click(function(){
+        Blockslogs=[];
+        Ammount=[];
+        Accountlogs=[];
+        Incblocks=[];
+        Eventslogs=[];
+        $("#accountevent").text("evento");
         console.log("se pulso boton filtrar logs!");
         var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
       
@@ -287,38 +298,60 @@
                 console.log(logs);
                 for(i=0;i<logs.length;i++)
                 {
+                    console.log(logs[i].args.pagador);
                     console.log(logs[i].blockNumber)
                     console.log(logs[i].args.cantidad.toString());
+                    Blockslogs.push(logs[i].blockNumber);
+                    Accountlogs.push(logs[i].args.pagador);
+                    Ammount.push(logs[i].args.cantidad.toString());
+                    Eventslogs.push(logs[i].event);
+                }
+                    console.log(Blockslogs);
                     
-                    web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
-                        if (err) {
-                            console.log(err);
-                            
-                        }
-                        else {
-                            
-                               $("#tablerow").append(
-                                    "<tr>" +
-                                        "<td>"+ "h1" +"</td>" +   
-                                        "<td>"+ "h2"+ "</td>" +   
-                                        "<td>"+ "s1"+ "</td>" +   
-                                        "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
-                                        "</tr>" 
-                                                                     )
-                            
-                            console.log(res);   
-                            console.log(new Date((res.timestamp)*1000));
-                            //console.log(Date((res.timestamp+inc)*1000));
-                           // }
-                        }    
-    
-                    });
-                    
-                }    
+                    for(i=0;i<logs.length;i++)
+                    {
+                        console.log(logs.length);
+                        console.log(Blockslogs.length);
+                        web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
+                            if (err) {
+                                console.log(err);
+                                
+                            }
+                            else {
+                                  Incblocks++;
+                                  console.log(Incblocks);
+                             
+                                   $("#tablerow").append(
+                                        "<tr>" +
+                                            "<td>"+ Blockslogs[Incblocks-1] +"</td>" +   
+                                            "<td>"+ Eventslogs[Incblocks-1] + "</td>" +   
+                                            "<td>"+ Ammount[Incblocks-1] + "</td>" +   
+                                            "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
+                                            "</tr>" 
+                                                                         )
+                                                            
+                                                                        // prueba=res.timestamp;
+                                console.log(res);   
+                                console.log(new Date((res.timestamp)*1000));
+                                //console.log(Date((res.timestamp+inc)*1000));
+                               // }
+                            }    
+        
+                        });
+                        
+                    } 
 
             }
       
         });
+           
+    });
+
+
+    $("#stoplogs").click(function(){
+        
+        console.log(prueba);
+        
            
     });
 
