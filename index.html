@@ -58,12 +58,12 @@
 
       <div class="container"> 
             <div class="btn-group-vertical col-md-6">
-                <input type="submit" class="btn btn btn-default" value="Filter logs" id="filterlogsreal">
+                <input type="submit" class="btn btn btn-default" value="Filter logs time real" id="filterlogsreal">
                 <input type="submit" class="btn btn btn-danger" value="stop logs" id="stoplogs">
             </div>
             <div class="btn-group-vertical col-md-6">
-                <input type="submit" class="btn btn-success col-md-3" value="All events " id="filtereventsreal">
-                <input type="submit" class="btn btn-success col-md-3" value="All events " id="stopevents">
+                <input type="submit" class="btn btn-success col-md-3" value="filter events time real " id="filtereventsreal">
+                <input type="submit" class="btn btn-success col-md-3" value="stop events " id="stopevents">
             </div>
         </div>
         <br>
@@ -91,6 +91,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        var filter=null;
+        var events=null;
         // arrays events and filters
         var Blockslogs=[];
         var Accountlogs=[];
@@ -124,17 +126,6 @@
                 Eventslogs.push(logs[i].event);
             }
         }
-
-   /*     function createArrayFilters(logs){
-
-            for(i=0;i<logs.length;i++)
-            {
-                Blockslogs.push(logs[i].blockNumber); 
-                Eventsignature.push(logs[i].topics[0]);
-                Topicvar.push(logs[i].topics[1]);
-                Datafilter.push(logs[i].data);
-            }
-        } */
 
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
@@ -222,7 +213,7 @@
             toBlock: "latest",
             address: "0x3a56fdc9a25614f8a6cc013ed44c7fb58c6a8eb0"
         };
-        var filter = web3.eth.filter(options);
+        filter = web3.eth.filter(options);
         filter.get(function(error,logs){
             if(error){
                 console.log('GET Error:',error);
@@ -252,10 +243,12 @@
     $("#filtereventsharvest").click(function(){
         $("#accountevent").text("address");
         $("#tablerow").html("");
+        $("dataammount").text("Ammount");    
+        $("#datadate").text("Date");
 
         clearArrays(); 
 
-        var events = instance.QuienCobro({cobrador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
+         events = instance.QuienCobro({cobrador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
       
          events.get(function(error, logs){
             if(error){
@@ -298,12 +291,14 @@
 
 
     $("#filtereventtransfer").click(function(){
+        $("dataammount").text("Ammount");    
+        $("#datadate").text("Date");
         $("#accountevent").text("address");
         $("#tablerow").html("");
         
         clearArrays(); 
 
-        var events = instance.QuienPago({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
+         events = instance.QuienPago({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
       
          events.get(function(error, logs){
             if(error){
@@ -348,9 +343,12 @@
         
         clearArrays(); 
         $("#tablerow").html("");
-        $("#accountevent").text("evento");
+        $("dataammount").text("Ammount");    
+        $("#accountevent").text("Evento");
+        $("#datadate").text("Date");
+         
         console.log("se pulso boton filtrar logs!");
-        var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
+         events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
       
          events.get(function(error, logs){
             if(error){
@@ -399,13 +397,63 @@
            
     });
 
+    $("#filterlogsreal").click(function(){
+        console.log("se pulsaron los logs reales!");
+        var options= {
+            fromBlock:2381500,
+            toBlock: "latest",
+            address: "0x3a56fdc9a25614f8a6cc013ed44c7fb58c6a8eb0"
+        };
 
-    $("#stoplogs").click(function(){
-        
-        console.log(prueba);
-        
+         filter=  web3.eth.filter(options);
+
+        filter.watch(function(error,logs){
+            if(error){
+                console.log('GET Error:',error);
+                
+            } else {
+                console.log("ingreso a los logs!")
+                console.log(logs);
+           
+            }    
+
+        });
            
     });
+
+
+    $("#stoplogs").click(function(){
+
+        filter.stopWatching();
+     
+                   
+    });
+
+
+    $("#filtereventsreal").click(function(){
+        events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
+        
+           events.watch(function(error, logs){
+              if(error){
+                  console.log('GET Error:',error);
+                  
+              } else {
+                  console.log(logs);
+              }
+        
+          });
+           
+    });
+
+
+    $("#stopevents").click(function(){
+
+        events.stopWatching();
+     
+                   
+    });
+
+  
 
       // evento apenas se recarga la pagina
       window.onload = function() {  
