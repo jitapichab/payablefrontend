@@ -66,6 +66,20 @@
                 <input type="submit" class="btn btn-success col-md-3" value="All events " id="filterallevents">
             </div>
         </div>
+        <br>
+        <table class="table" id="tableconcat"> 
+            <thead>
+                <tr>
+                    <th>Num Bloque</th>
+                    <th id="accountevent">Account</th>
+                    <th>Ammount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="tablerow">
+
+            </tbody>
+        </table>
       
 
 
@@ -77,6 +91,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        var logs=null;
             $("#firstcolumn").text("prueba");
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
@@ -261,7 +276,6 @@
 
     $("#filterallevents").click(function(){
         console.log("se pulso boton filtrar logs!");
-
         var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
       
          events.get(function(error, logs){
@@ -270,18 +284,28 @@
                 
             } else {
                 console.log(logs);
+                console.log(logs);
                 for(i=0;i<logs.length;i++)
                 {
-                    console.log(logs[i].blockNumber);
-                    console.log(logs[i].args.cantidad.toString()); 
-
+                    console.log(logs[i].blockNumber)
+                    console.log(logs[i].args.cantidad.toString());
+                    
                     web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
                         if (err) {
                             console.log(err);
+                            
                         }
                         else {
-                           // for(i=0;i<res.length;i++)
-                           // {
+                            
+                               $("#tablerow").append(
+                                    "<tr>" +
+                                        "<td>"+ "h1" +"</td>" +   
+                                        "<td>"+ "h2"+ "</td>" +   
+                                        "<td>"+ "s1"+ "</td>" +   
+                                        "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
+                                        "</tr>" 
+                                                                     )
+                            
                             console.log(res);   
                             console.log(new Date((res.timestamp)*1000));
                             //console.log(Date((res.timestamp+inc)*1000));
@@ -295,7 +319,7 @@
             }
       
         });
-
+           
     });
 
       // evento apenas se recarga la pagina
@@ -312,7 +336,7 @@
 
 
     </script>
-
+   
 
 </body>
 </html>

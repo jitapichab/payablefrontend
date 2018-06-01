@@ -42,7 +42,7 @@
     var    abiDefinition= JSON.parse(contract_abidefinition);
     // crear objeto de tipo contrato con el json
     var contract = web3.eth.contract(abiDefinition);
-    var instance= contract.at("0x5fAd5e614b7eaDC66C6A5C4f1Eb3775f612a6Be1");
+    var instance= contract.at("0xd80a445a5A2933B8EA1f3599Ca6b78b1a212B033");
     console.log(instance);
     $("#loader").hide();
     var fecha=new Date();
