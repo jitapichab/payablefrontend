@@ -70,10 +70,10 @@
         <table class="table" id="tableconcat"> 
             <thead>
                 <tr>
-                    <th>Num Bloque</th>
+                    <th id= "numblock"> Num Bloque</th>
                     <th id="accountevent">Account</th>
-                    <th>Ammount</th>
-                    <th>Date</th>
+                    <th id="dataammount">Ammount</th>
+                    <th id="datadate">Date</th>
                 </tr>
             </thead>
             <tbody id="tablerow">
@@ -91,12 +91,18 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        // arrays events and filters
         var Blockslogs=[];
         var Accountlogs=[];
         var Ammount=[]; 
         var Eventslogs=[];
         var Collectorlogs=[];
         var Incblocks=0;
+        var Eventsignature=[];
+        var Datafilter=[];
+        var Topicvar=[];
+
+
         
 
         function clearArrays(){
@@ -107,18 +113,28 @@
             Eventslogs=[];
         }
 
-        function createArrayLogs(logs){
+        function createArrayEvents(logs){
 
             for(i=0;i<logs.length;i++)
             {
                 Blockslogs.push(logs[i].blockNumber);  
                 Accountlogs.push(logs[i].args.pagador);
                 Collectorlogs.push(logs[i].args.cobrador);
-                console.log(logs[i].args.cobrador);
                 Ammount.push(logs[i].args.cantidad.toString());
                 Eventslogs.push(logs[i].event);
             }
         }
+
+   /*     function createArrayFilters(logs){
+
+            for(i=0;i<logs.length;i++)
+            {
+                Blockslogs.push(logs[i].blockNumber); 
+                Eventsignature.push(logs[i].topics[0]);
+                Topicvar.push(logs[i].topics[1]);
+                Datafilter.push(logs[i].data);
+            }
+        } */
 
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
@@ -193,7 +209,13 @@
       });
 
       $("#filterlogs").click(function(){
-        console.log("se pulso boton filtrar logs 2!");
+        $("#accountevent").text("event signature");
+        $("#dataammount").text("topic variable");
+        $("#datadate").text("data");
+        $("#tablerow").html("");
+        
+
+     
 
         var options= {
             fromBlock:"1",
@@ -209,7 +231,16 @@
                 console.log(logs);
                 for(i=0;i<logs.length;i++)
                {
-                  console.log(logs[i]);
+                 
+                  $("#tablerow").append(
+                    "<tr>" +
+                        "<td>"+ logs[i].blockNumber +"</td>" +   
+                        "<td>"+ logs[i].topics[0] + "</td>" +   
+                        "<td>"+ logs[i].topics[1]+ "</td>" +   
+                        "<td>"+logs[i].data+"</td>" + 
+                        "</tr>" 
+                                                        )
+               
                     
                }    
             }    
@@ -220,6 +251,8 @@
 
     $("#filtereventsharvest").click(function(){
         $("#accountevent").text("address");
+        $("#tablerow").html("");
+
         clearArrays(); 
 
         var events = instance.QuienCobro({cobrador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
@@ -230,7 +263,7 @@
                 
             } else {
                 console.log(logs);
-                createArrayLogs(logs);      
+                createArrayEvents(logs);      
                 for(i=0;i<logs.length;i++)
                 { 
 
@@ -266,6 +299,8 @@
 
     $("#filtereventtransfer").click(function(){
         $("#accountevent").text("address");
+        $("#tablerow").html("");
+        
         clearArrays(); 
 
         var events = instance.QuienPago({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
@@ -276,7 +311,7 @@
                 
             } else {
                 console.log(logs);
-                createArrayLogs(logs);      
+                createArrayEvents(logs);      
                 for(i=0;i<logs.length;i++)
                 { 
 
@@ -312,6 +347,7 @@
     $("#filterallevents").click(function(){
         
         clearArrays(); 
+        $("#tablerow").html("");
         $("#accountevent").text("evento");
         console.log("se pulso boton filtrar logs!");
         var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
@@ -323,7 +359,7 @@
             } else {
                 console.log(logs);
                 console.log(logs);
-                createArrayLogs(logs);      
+                createArrayEvents(logs);      
                 for(i=0;i<logs.length;i++)
                 {
                     console.log(logs.length);
