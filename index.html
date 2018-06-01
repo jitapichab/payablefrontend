@@ -95,8 +95,31 @@
         var Accountlogs=[];
         var Ammount=[]; 
         var Eventslogs=[];
+        var Collectorlogs=[];
         var Incblocks=0;
         
+
+        function clearArrays(){
+            Blockslogs=[];
+            Ammount=[];
+            Accountlogs=[];
+            Incblocks=[];
+            Eventslogs=[];
+        }
+
+        function createArrayLogs(logs){
+
+            for(i=0;i<logs.length;i++)
+            {
+                Blockslogs.push(logs[i].blockNumber);  
+                Accountlogs.push(logs[i].args.pagador);
+                Collectorlogs.push(logs[i].args.cobrador);
+                console.log(logs[i].args.cobrador);
+                Ammount.push(logs[i].args.cantidad.toString());
+                Eventslogs.push(logs[i].event);
+            }
+        }
+
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
         } else {
@@ -104,34 +127,34 @@
         }
         web3.eth.defaultAccount = web3.eth.accounts[0];
         
-    var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"pagador","type":"address"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"cobrador","type":"address"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
-    var    abiDefinition= JSON.parse(contract_abidefinition);
-    // crear objeto de tipo contrato con el json
-    var contract = web3.eth.contract(abiDefinition);
-    var instance= contract.at("0x3a56fdc9a25614f8a6cc013ed44c7fb58c6a8eb0");
-    console.log(instance);
-    $("#loader").hide();
-    var fecha=new Date();
-    fecha= fecha.toString();
-    console.log(fecha);
-    
-    $("#collect").click(function() {
-        console.log("ingreso una vez ");
-        $("#loader").show();
-        var value=$('#collectmoneycontract').val();
-        instance.Cobrar(web3.toWei(value, 'ether'),(err,res)=>{ 
-            if (!err) {
-            $("#loader").hide();
-            $("#collectlabelmoney").text(res);
-            }
-            else {
+        var contract_abidefinition='[{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"pagador","type":"address"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"cobrador","type":"address"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
+        var abiDefinition= JSON.parse(contract_abidefinition);
+        // crear objeto de tipo contrato con el json
+        var contract = web3.eth.contract(abiDefinition);
+        var instance= contract.at("0x3a56fdc9a25614f8a6cc013ed44c7fb58c6a8eb0");
+        console.log(instance);
+        $("#loader").hide();
+        var fecha=new Date();
+        fecha= fecha.toString();
+        console.log(fecha);
+        
+        $("#collect").click(function() {
+            console.log("ingreso una vez ");
+            $("#loader").show();
+            var value=$('#collectmoneycontract').val();
+            instance.Cobrar(web3.toWei(value, 'ether'),(err,res)=>{ 
+                if (!err) {
                 $("#loader").hide();
-                alert(err);
-               
-            }
+                $("#collectlabelmoney").text(res);
+                }
+                else {
+                    $("#loader").hide();
+                    alert(err);
+                
+                }
+            });
+        
         });
-    
-      });
 
       $("#verify").click(function() {
         console.log("verificar");
@@ -146,7 +169,7 @@
             }
             $("#loader").hide();});
     
-      });
+        });
 
       $("#transfermony").click(function() {
         console.log("verificar");
@@ -173,11 +196,9 @@
         console.log("se pulso boton filtrar logs 2!");
 
         var options= {
-            "fromBlock":"1",
-            "toBlock": "latest",
-            "address":[
-                "0x654d9E07C49a4ab6E14681F02f26F24305FC50A7"
-            ]
+            fromBlock:"1",
+            toBlock: "latest",
+            address: "0x3a56fdc9a25614f8a6cc013ed44c7fb58c6a8eb0"
         };
         var filter = web3.eth.filter(options);
         filter.get(function(error,logs){
@@ -198,9 +219,10 @@
     });
 
     $("#filtereventsharvest").click(function(){
-        console.log("se pulso boton filtrar logs!");
+        $("#accountevent").text("address");
+        clearArrays(); 
 
-        var events = instance.QuienCobro({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
+        var events = instance.QuienCobro({cobrador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
       
          events.get(function(error, logs){
             if(error){
@@ -208,22 +230,26 @@
                 
             } else {
                 console.log(logs);
+                createArrayLogs(logs);      
                 for(i=0;i<logs.length;i++)
-                {
-                    console.log(logs[i].blockNumber);
-                    console.log(logs[i].args.cantidad.toString()); 
+                { 
 
                     web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
                         if (err) {
                             console.log(err);
                         }
                         else {
-                           // for(i=0;i<res.length;i++)
-                           // {
-                            console.log(res);   
-                            console.log(new Date((res.timestamp)*1000));
-                            //console.log(Date((res.timestamp+inc)*1000));
-                           // }
+                            Incblocks++;
+                            console.log(Incblocks);
+                        
+                            $("#tablerow").append(
+                                "<tr>" +
+                                    "<td>"+ Blockslogs[Incblocks-1] +"</td>" +   
+                                    "<td>"+ Collectorlogs[Incblocks-1] + "</td>" +   
+                                    "<td>"+ Ammount[Incblocks-1] + "</td>" +   
+                                    "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
+                                    "</tr>" 
+                                                                    )
                         }    
     
                     });
@@ -239,7 +265,8 @@
 
 
     $("#filtereventtransfer").click(function(){
-        console.log("se pulso boton filtrar logs!");
+        $("#accountevent").text("address");
+        clearArrays(); 
 
         var events = instance.QuienPago({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
       
@@ -249,23 +276,26 @@
                 
             } else {
                 console.log(logs);
+                createArrayLogs(logs);      
                 for(i=0;i<logs.length;i++)
-                {
-                    console.log(logs[i].blockNumber);
-                    console.log(logs[i].args.cantidad.toString()); 
+                { 
 
                     web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
                         if (err) {
                             console.log(err);
                         }
                         else {
-                           // for(i=0;i<res.length;i++)
-                           // {
-                              
-                            console.log(res);   
-                            console.log(new Date((res.timestamp)*1000));
-                            //console.log(Date((res.timestamp+inc)*1000));
-                           // }
+                            Incblocks++;
+                            console.log(Incblocks);
+                        
+                            $("#tablerow").append(
+                                "<tr>" +
+                                    "<td>"+ Blockslogs[Incblocks-1] +"</td>" +   
+                                    "<td>"+ Accountlogs[Incblocks-1] + "</td>" +   
+                                    "<td>"+ Ammount[Incblocks-1] + "</td>" +   
+                                    "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
+                                    "</tr>" 
+                                                                    )
                         }    
     
                     });
@@ -280,11 +310,8 @@
 
 
     $("#filterallevents").click(function(){
-        Blockslogs=[];
-        Ammount=[];
-        Accountlogs=[];
-        Incblocks=[];
-        Eventslogs=[];
+        
+        clearArrays(); 
         $("#accountevent").text("evento");
         console.log("se pulso boton filtrar logs!");
         var events = instance.allEvents({ fromBlock:1, toBlock: "latest" });
@@ -296,50 +323,39 @@
             } else {
                 console.log(logs);
                 console.log(logs);
+                createArrayLogs(logs);      
                 for(i=0;i<logs.length;i++)
                 {
-                    console.log(logs[i].args.pagador);
-                    console.log(logs[i].blockNumber)
-                    console.log(logs[i].args.cantidad.toString());
-                    Blockslogs.push(logs[i].blockNumber);
-                    Accountlogs.push(logs[i].args.pagador);
-                    Ammount.push(logs[i].args.cantidad.toString());
-                    Eventslogs.push(logs[i].event);
-                }
-                    console.log(Blockslogs);
-                    
-                    for(i=0;i<logs.length;i++)
-                    {
-                        console.log(logs.length);
-                        console.log(Blockslogs.length);
-                        web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
-                            if (err) {
-                                console.log(err);
-                                
-                            }
-                            else {
-                                  Incblocks++;
-                                  console.log(Incblocks);
-                             
-                                   $("#tablerow").append(
-                                        "<tr>" +
-                                            "<td>"+ Blockslogs[Incblocks-1] +"</td>" +   
-                                            "<td>"+ Eventslogs[Incblocks-1] + "</td>" +   
-                                            "<td>"+ Ammount[Incblocks-1] + "</td>" +   
-                                            "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
-                                            "</tr>" 
-                                                                         )
-                                                            
-                                                                        // prueba=res.timestamp;
-                                console.log(res);   
-                                console.log(new Date((res.timestamp)*1000));
-                                //console.log(Date((res.timestamp+inc)*1000));
-                               // }
-                            }    
-        
-                        });
+                    console.log(logs.length);
+                    console.log(Blockslogs.length);
+                    web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
+                        if (err) {
+                            console.log(err);
+                            
+                        }
+                        else {
+                            Incblocks++;
+                            console.log(Incblocks);
                         
-                    } 
+                            $("#tablerow").append(
+                                "<tr>" +
+                                    "<td>"+ Blockslogs[Incblocks-1] +"</td>" +   
+                                    "<td>"+ Eventslogs[Incblocks-1] + "</td>" +   
+                                    "<td>"+ Ammount[Incblocks-1] + "</td>" +   
+                                    "<td>"+new Date((res.timestamp)*1000)+"</td>" + 
+                                    "</tr>" 
+                                                                    )
+                                                        
+                                                                    // prueba=res.timestamp;
+                            console.log(res);   
+                            console.log(new Date((res.timestamp)*1000));
+                            //console.log(Date((res.timestamp+inc)*1000));
+                            // }
+                        }    
+    
+                    });
+                    
+                } 
 
             }
       
