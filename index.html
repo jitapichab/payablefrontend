@@ -52,38 +52,7 @@
         <input type="submit" class="btn btn-success col-md-3" value="All events " id="filterallevents">
     </div>
 
-    <div class="container">
-        <h2>Basic Table</h2>
-        <p>The .table class adds basic styling (light padding and only horizontal dividers) to a table:</p>            
-        <table class="table">
-          <thead>
-            <tr>
-              <th id="firstcolumn">Firstname</th>
-              <th>Lastname</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>John</td>
-              <td>Doe</td>
-              <td>john@example.com</td>
-            </tr>
-            <tr>
-              <td>Mary</td>
-              <td>Moe</td>
-              <td>mary@example.com</td>
-            </tr>
-            <tr>
-              <td>July</td>
-              <td>Dooley</td>
-              <td>july@example.com</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <br>
+    
 
       <center><h2>Logs and events in real time money </h2></center> <br>
 
@@ -116,11 +85,11 @@
         }
         web3.eth.defaultAccount = web3.eth.accounts[0];
         
-    var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"fecha","type":"string"}],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"fecha","type":"string"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"pagador","type":"address"},{"indexed":false,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"cobrador","type":"address"},{"indexed":false,"name":"fecha","type":"string"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
+    var    contract_abidefinition='[{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"Cobrar","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"AcumuladoContrato","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"PagarMas","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"pagador","type":"address"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienPago","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"cobrador","type":"address"},{"indexed":false,"name":"cantidad","type":"uint256"}],"name":"QuienCobro","type":"event"}]';
     var    abiDefinition= JSON.parse(contract_abidefinition);
     // crear objeto de tipo contrato con el json
     var contract = web3.eth.contract(abiDefinition);
-    var instance= contract.at("0x654d9E07C49a4ab6E14681F02f26F24305FC50A7");
+    var instance= contract.at("0x3a56fdc9a25614f8a6cc013ed44c7fb58c6a8eb0");
     console.log(instance);
     $("#loader").hide();
     var fecha=new Date();
@@ -131,7 +100,7 @@
         console.log("ingreso una vez ");
         $("#loader").show();
         var value=$('#collectmoneycontract').val();
-        instance.Cobrar(value,fecha,(err,res)=>{ 
+        instance.Cobrar(web3.toWei(value, 'ether'),(err,res)=>{ 
             if (!err) {
             $("#loader").hide();
             $("#collectlabelmoney").text(res);
@@ -165,7 +134,7 @@
         $("#loader").show();
         var valor=$('#transferiracontrato').val();
         console.log(valor);
-        instance.PagarMas(fecha,{
+        instance.PagarMas({
             // from: web3.eth.defaultAccount,
              value: web3.toWei(valor, 'ether'), 
            },(err,res)=>{ 
@@ -174,8 +143,8 @@
             $("#loader").hide();
               }
               else {
-                $("#loader").hide();
                   alert(err);
+                  $("#loader").hide();
               }      
         });
     
@@ -209,6 +178,87 @@
 
     });
 
+    $("#filtereventsharvest").click(function(){
+        console.log("se pulso boton filtrar logs!");
+
+        var events = instance.QuienCobro({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
+      
+         events.get(function(error, logs){
+            if(error){
+                console.log('GET Error:',error);
+                
+            } else {
+                console.log(logs);
+                for(i=0;i<logs.length;i++)
+                {
+                    console.log(logs[i].blockNumber);
+                    console.log(logs[i].args.cantidad.toString()); 
+
+                    web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                           // for(i=0;i<res.length;i++)
+                           // {
+                            console.log(res);   
+                            console.log(new Date((res.timestamp)*1000));
+                            //console.log(Date((res.timestamp+inc)*1000));
+                           // }
+                        }    
+    
+                    });
+                    
+                }    
+
+            }
+      
+        });
+
+    });
+
+
+
+    $("#filtereventtransfer").click(function(){
+        console.log("se pulso boton filtrar logs!");
+
+        var events = instance.QuienPago({pagador:web3.eth.defaultAccount},{ fromBlock:1, toBlock: "latest" });
+      
+         events.get(function(error, logs){
+            if(error){
+                console.log('GET Error:',error);
+                
+            } else {
+                console.log(logs);
+                for(i=0;i<logs.length;i++)
+                {
+                    console.log(logs[i].blockNumber);
+                    console.log(logs[i].args.cantidad.toString()); 
+
+                    web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                           // for(i=0;i<res.length;i++)
+                           // {
+                            console.log(res);   
+                            console.log(new Date((res.timestamp)*1000));
+                            //console.log(Date((res.timestamp+inc)*1000));
+                           // }
+                        }    
+    
+                    });
+                    
+                }    
+
+            }
+      
+        });
+
+    });
+
+
     $("#filterallevents").click(function(){
         console.log("se pulso boton filtrar logs!");
 
@@ -223,7 +273,22 @@
                 for(i=0;i<logs.length;i++)
                 {
                     console.log(logs[i].blockNumber);
-                    console.log(logs[i].args.cantidad.c[0]);
+                    console.log(logs[i].args.cantidad.toString()); 
+
+                    web3.eth.getBlock(logs[i].blockNumber,(err,res) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                           // for(i=0;i<res.length;i++)
+                           // {
+                            console.log(res);   
+                            console.log(new Date((res.timestamp)*1000));
+                            //console.log(Date((res.timestamp+inc)*1000));
+                           // }
+                        }    
+    
+                    });
                     
                 }    
 
